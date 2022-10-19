@@ -1,0 +1,19 @@
+---
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: exorcism
+webhooks:
+  - name: exorcism.default.svc
+    clientConfig:
+      service:
+        name: exorcism
+        namespace: default
+        path: "/mutate/pods"
+      caBundle: "${CA_BUNDLE}"
+    rules:
+      - operations: ["CREATE"]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+    failurePolicy: Ignore

@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: exorcism
+  namespace: default
+  labels:
+    app: exorcism
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: exorcism
+  template:
+    metadata:
+      labels:
+        app: exorcism
+    spec:
+      containers:
+      - name: server
+        image: buzzsurfr/exorcism:latest
+        imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8443
+            scheme: HTTPS
+        ports:
+        - containerPort: 8443
+        volumeMounts:
+        - name: tls-certs
+          mountPath: /etc/certs
+          readOnly: true
+      volumes:
+      - name: tls-certs
+        secret:
+          secretName: admission-tls
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: exorcism
+  namespace: default
+spec:
+  selector:
+    app: exorcism
+  ports:
+    - port: 443
+      targetPort: 8443
