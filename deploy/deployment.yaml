@@ -1,3 +1,32 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: exorcizer
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: exorcism-role
+rules:
+- apiGroups: [""]
+  resources: ["daemonsets"]
+  verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: read-daemonsets-global
+subjects:
+- kind: ServiceAccount
+  name: exorcizer
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: exorcism-role
+  apiGroup: rbac.authorization.k8s.io
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -30,6 +59,7 @@ spec:
         - name: tls-certs
           mountPath: /etc/certs
           readOnly: true
+      serviceAccountName: exorcizer
       volumes:
       - name: tls-certs
         secret:
