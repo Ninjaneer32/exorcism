@@ -4,7 +4,7 @@ kind: MutatingWebhookConfiguration
 metadata:
   name: exorcism
 webhooks:
-  - name: exorcism.default.svc
+  - name: exorcism.default.svc.cluster.local
     clientConfig:
       service:
         name: exorcism
