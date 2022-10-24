@@ -4,7 +4,7 @@ echo "Creating certificates"
 mkdir certs
 openssl req -nodes -new -x509 -keyout certs/ca.key -out certs/ca.crt -subj "/CN=Admission Controller Demo"
 openssl genrsa -out certs/admission-tls.key 2048
-openssl req -new -key certs/admission-tls.key -subj "/CN=exorcism.default.svc.cluster.local" -addext "subjectAltName = DNS:exorcism.default" | openssl x509 -req -CA certs/ca.crt -CAkey certs/ca.key -CAcreateserial -out certs/admission-tls.crt
+openssl req -new -key certs/admission-tls.key -subj "/CN=exorcism.default.svc.cluster.local" | openssl x509 -req -CA certs/ca.crt -CAkey certs/ca.key -CAcreateserial -out certs/admission-tls.crt
 
 echo "Creating k8s Secret"
 kubectl create secret tls admission-tls \
