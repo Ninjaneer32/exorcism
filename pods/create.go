@@ -2,7 +2,6 @@ package pods
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/buzzsurfr/exorcism"
@@ -11,6 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	log "k8s.io/klog/v2"
 )
 
 func validateCreate() exorcism.AdmitFunc {
@@ -49,8 +49,10 @@ func mutateCreate() exorcism.AdmitFunc {
 		if err != nil {
 			panic(err.Error())
 		}
+		log.Infof("%d DaemonSets found", daemonsets.Size())
 		for _, daemonset := range daemonsets.Items {
-			fmt.Printf("%s\t%s\n", daemonset.Namespace, daemonset.Name)
+			// fmt.Printf("%s\t%s\n", daemonset.Namespace, daemonset.Name)
+			log.Infof("DaemonSet %s/%s found", daemonset.Namespace, daemonset.Name)
 		}
 
 		var operations []exorcism.PatchOperation
