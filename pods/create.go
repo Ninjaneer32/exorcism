@@ -10,6 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"k8s.io/klog"
 	log "k8s.io/klog/v2"
 )
 
@@ -77,6 +78,8 @@ func mutateCreate() exorcism.AdmitFunc {
 		// Add a simple annotation using `AddPatchOperation`
 		// metadata := map[string]string{"origin": "fromMutation"}
 		// operations = append(operations, exorcism.AddPatchOperation("/metadata/annotations", metadata))
+
+		klog.Flush()
 		return &exorcism.Result{
 			Allowed:  true,
 			PatchOps: operations,
