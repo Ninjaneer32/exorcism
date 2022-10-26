@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -14,13 +15,20 @@ import (
 
 var (
 	tlscert, tlskey, port string
+	version               bool
 )
 
 func main() {
 	flag.StringVar(&tlscert, "tlscert", "/etc/certs/tls.crt", "Path to the TLS certificate")
 	flag.StringVar(&tlskey, "tlskey", "/etc/certs/tls.key", "Path to the TLS key")
 	flag.StringVar(&port, "port", "8443", "The port to listen")
+	flag.BoolVar(&version, "version", false, "Print version and exit")
 	flag.Parse()
+
+	if version {
+		fmt.Println("Version built on 2022-10-26")
+		os.Exit(1)
+	}
 
 	server := http.NewServer(port)
 	go func() {
