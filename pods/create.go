@@ -80,7 +80,7 @@ func mutateCreate() exorcism.AdmitFunc {
 
 		log.Flush()
 		return &exorcism.Result{
-			Allowed:  true,
+			Allowed:  false,
 			PatchOps: operations,
 		}, nil
 	}
