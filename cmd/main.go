@@ -8,7 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/douglasmakey/admissioncontroller/http"
+	"github.com/buzzsurfr/exorcism/http"
 
 	log "k8s.io/klog/v2"
 )

@@ -4,8 +4,9 @@ go 1.19
 
 replace github.com/buzzsurfr/exorcism/http => ./http
 
+replace github.com/buzzsurfr/exorcism/pods => ./pods
+
 require (
-	github.com/douglasmakey/admissioncontroller v0.0.0-20210526145435-bed9054f8e63
 	k8s.io/api v0.25.3
 	k8s.io/apimachinery v0.25.3
 	k8s.io/client-go v0.25.3
