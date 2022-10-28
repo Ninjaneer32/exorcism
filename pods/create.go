@@ -49,7 +49,7 @@ func mutateCreate() exorcism.AdmitFunc {
 		if err != nil {
 			panic(err.Error())
 		}
-		log.Infof("%d DaemonSets found", daemonsets.Size())
+		log.Infof("%d DaemonSets found", len(daemonsets.Items))
 		for _, daemonset := range daemonsets.Items {
 			// fmt.Printf("%s\t%s\n", daemonset.Namespace, daemonset.Name)
 			log.Infof("DaemonSet %s/%s found", daemonset.Namespace, daemonset.Name)
