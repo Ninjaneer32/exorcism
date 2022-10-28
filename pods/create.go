@@ -45,43 +45,59 @@ func mutateCreate() exorcism.AdmitFunc {
 			panic(err.Error())
 		}
 
+		// Setup return values and get info from request
+		var operations []exorcism.PatchOperation
+		pod, err := parsePod(r.Object.Raw)
+		if err != nil {
+			return &exorcism.Result{Msg: err.Error()}, nil
+		}
+
 		daemonsets, err := clientset.AppsV1().DaemonSets("").List(context.TODO(), metav1.ListOptions{})
 		if err != nil {
 			panic(err.Error())
 		}
 		log.Infof("%d DaemonSets found", len(daemonsets.Items))
 		for _, daemonset := range daemonsets.Items {
-			// fmt.Printf("%s\t%s\n", daemonset.Namespace, daemonset.Name)
-			log.Infof("DaemonSet %s/%s found", daemonset.Namespace, daemonset.Name)
+			// log.Infof("DaemonSet %s/%s found", daemonset.Namespace, daemonset.Name)
+			
+			// Ignore DaemonSets for known kubernetes components that do not interface as a sidecar
+			ignoredLabelKeys := ["k8s-app"]
+			ignoreDaemonSet := false
+			for k := range daemonset.ObjectMeta.Labels {
+				if contains(ignoredLabelKeys, k) {
+					ignoreDaemonSet = true
+				}
+			}
+			if(ignoreDaemonSet) {
+				log.Infof("Ignored %s/%s because it's part of the standard kubernetes deployment.", daemonset.Namespace, daemonset.Name)
+				continue
+			}
+
+			var containers []v1.Container
+			containers = append(containers, pod.Spec.Containers...)
+			sideCar := daemonset.Spec.Template.Spec.DeepCopy().Containers
+			containers = append(containers, sideCar)
+			operations = append(operations, exorcism.ReplacePatchOperation("/spec/containers", containers))
+			
 		}
 
-		var operations []exorcism.PatchOperation
-		// pod, err := parsePod(r.Object.Raw)
-		// if err != nil {
-		// 	return &exorcism.Result{Msg: err.Error()}, nil
-		// }
-
-		// Very simple logic to inject a new "sidecar" container.
-		// if pod.Namespace == "special" {
-		// 	var containers []v1.Container
-		// 	containers = append(containers, pod.Spec.Containers...)
-		// 	sideC := v1.Container{
-		// 		Name:    "test-sidecar",
-		// 		Image:   "busybox:stable",
-		// 		Command: []string{"sh", "-c", "while true; do echo 'I am a container injected by mutating webhook'; sleep 2; done"},
-		// 	}
-		// 	containers = append(containers, sideC)
-		// 	operations = append(operations, exorcism.ReplacePatchOperation("/spec/containers", containers))
-		// }
-
-		// Add a simple annotation using `AddPatchOperation`
-		// metadata := map[string]string{"origin": "fromMutation"}
-		// operations = append(operations, exorcism.AddPatchOperation("/metadata/annotations", metadata))
+		Add a simple annotation using `AddPatchOperation`
+		metadata := map[string]string{"origin": "fromMutation"}
+		operations = append(operations, exorcism.AddPatchOperation("/metadata/annotations", metadata))
 
 		log.Flush()
 		return &exorcism.Result{
-			Allowed:  false,
+			Allowed:  true,
 			PatchOps: operations,
 		}, nil
 	}
+}
+
+func contains(set []string, element string) bool {
+    for _, v := range set {
+        if v == element {
+            return true
+        }
+    }
+    return false
 }
