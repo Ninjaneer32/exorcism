@@ -10,7 +10,7 @@ kind: ClusterRole
 metadata:
   name: exorcism-role
 rules:
-- apiGroups: [""]
+- apiGroups: ["apps"]
   resources: ["daemonsets"]
   verbs: ["get", "watch", "list"]
 ---
