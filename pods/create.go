@@ -84,14 +84,14 @@ func mutateCreate() exorcism.AdmitFunc {
 				// Remove host port from ports
 				var ports []v1.ContainerPort
 				for _, port := range c.Ports {
+					ports = append(ports, v1.ContainerPort{
+						ContainerPort: port.ContainerPort,
+						// HostIP: port.HostIP,
+						// HostPort: portHostPort,
+						Name:     port.Name,
+						Protocol: port.Protocol,
+					})
 				}
-				ports = append(ports, v1.ContainerPort{
-					containerPort: port.containerPort,
-					// hostIP: port.hostIP,
-					// hostPort: port.hostPort,
-					name:     port.name,
-					protocol: port.protocol,
-				})
 				c.Ports = ports
 			}
 
