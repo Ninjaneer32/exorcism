@@ -85,17 +85,19 @@ func mutateCreate() exorcism.AdmitFunc {
 				var ports []v1.ContainerPort
 				for _, port := range c.Ports {
 					ports = append(ports, v1.ContainerPort{
+						Name:          port.Name,
+						HostPort:      0,
 						ContainerPort: port.ContainerPort,
-						// HostIP: port.HostIP,
-						// HostPort: portHostPort,
-						Name:     port.Name,
-						Protocol: port.Protocol,
+						Protocol:      port.Protocol,
+						HostIP:        "",
 					})
 				}
 				c.Ports = ports
+
+				containers = append(containers, c)
 			}
 
-			containers = append(containers, sideCars...)
+			// containers = append(containers, sideCars...)
 			operations = append(operations, exorcism.ReplacePatchOperation("/spec/containers", containers))
 
 		}
