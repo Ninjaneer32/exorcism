@@ -77,8 +77,25 @@ func mutateCreate() exorcism.AdmitFunc {
 				continue
 			}
 
-			sideCar := daemonset.Spec.Template.Spec.DeepCopy().Containers
-			containers = append(containers, sideCar...)
+			// Mutate containers from daemonset and add to pod spec
+			sideCars := daemonset.Spec.Template.Spec.DeepCopy().Containers
+
+			for _, c := range sideCars {
+				// Remove host port from ports
+				var ports []v1.ContainerPort
+				for _, port := range c.Ports {
+				}
+				ports = append(ports, v1.ContainerPort{
+					containerPort: port.containerPort,
+					// hostIP: port.hostIP,
+					// hostPort: port.hostPort,
+					name:     port.name,
+					protocol: port.protocol,
+				})
+				c.Ports = ports
+			}
+
+			containers = append(containers, sideCars...)
 			operations = append(operations, exorcism.ReplacePatchOperation("/spec/containers", containers))
 
 		}
